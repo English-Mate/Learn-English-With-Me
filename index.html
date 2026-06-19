@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Slang Learner Pod</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <div class="podcast-container">
+        <h2>Episode 1: Casual Chit-Chat</h2>
+        
+        <audio id="podcast-audio" controls src="https://www.w3schools.com/html/horse.mp3"></audio>
+        
+        <div class="transcript">
+            <p>
+                "Hey! I was going to study tonight, but honestly, 
+                <span class="slang-word" data-definition="Completely exhausted or tired.">I'm totally wiped</span>. 
+                Can we take a rain check?"
+            </p>
+        </div>
+
+        <div id="definition-box" class="hidden">
+            <h3>Slang Meaning:</h3>
+            <p id="definition-text"></p>
+            <button id="close-btn">Got it!</button>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>

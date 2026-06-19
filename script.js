@@ -4,9 +4,10 @@ let timerInterval;
 let timeLeft = 2 * 60 * 60; // 2 hours in seconds
 
 const SYSTEM_INSTRUCTION = `
-You are a cool, casual AI podcast co-host who teaches slang naturally. 
-Keep responses brief (2-3 sentences max). Inject 1 slang word naturally.
-Format every slang word exactly like this so our application parses it: [slang: WORD | DEFINITION].
+You are a cool, casual AI podcast co-host who teaches slang and idioms naturally. 
+Keep responses brief (2-3 sentences max). Inject at least one slang word or idiom naturally into every response.
+If the user uses plain or standard English phrases, rephrase it or reply using cooler slang equivalents. For example, if they say they "watched their phone for 2-3 hours", tell them they were "glued to their phone". Do the same for other common phrases.
+CRITICAL: Format every slang word/idiom exactly like this so our application parses it: [slang: WORD | DEFINITION].
 `;
 
 const chatWindow = document.getElementById('chat-window');
@@ -16,21 +17,32 @@ const endBtn = document.getElementById('end-btn');
 const timerDisplay = document.getElementById('timer');
 const podcastContainer = document.getElementById('podcast-container');
 const summaryContainer = document.getElementById('summary-container');
-const podcastHeaderTitle = document.querySelector('.podcast-header h2');
 
 // Start countdown immediately
 startTimer();
 
-// 🤫 Secret Easter Egg Configuration
-let titleClickCount = 0;
-podcastHeaderTitle.style.cursor = 'pointer'; 
+// 🤫 Secret Easter Egg Configuration: Ctrl + 0 + P
+let keysPressed = {};
 
-podcastHeaderTitle.addEventListener('click', () => {
-    titleClickCount++;
-    if (titleClickCount === 5) {
+window.addEventListener('keydown', (e) => {
+    const keyLower = e.key.toLowerCase();
+    keysPressed[keyLower] = true;
+
+    // Activates if Ctrl is held, and either row-0, numpad-0, and P are triggered together
+    if (e.ctrlKey && (keysPressed['0'] || keysPressed['num0']) && keysPressed['p']) {
+        e.preventDefault(); 
+        
         document.getElementById('admin-vault').classList.toggle('hidden');
-        titleClickCount = 0; 
+        
+        // Clear immediately to prevent UI flickering loop
+        keysPressed['0'] = false;
+        keysPressed['num0'] = false;
+        keysPressed['p'] = false;
     }
+});
+
+window.addEventListener('keyup', (e) => {
+    keysPressed[e.key.toLowerCase()] = false;
 });
 
 // Admin Vault Save Action
@@ -53,10 +65,10 @@ async function handleSend() {
 
     const typingBubble = appendMessage("Gemini", "Thinking...", "ai-bubble");
 
-    // Automatically check user's local browser memory for your hidden master key
+    // Automatically check visitor's browser memory for the saved master key
     const targetKey = atob(localStorage.getItem('shared_gemini_key') || "");
     if (!targetKey) {
-        typingBubble.textContent = "System configuration missing. (Admin: Click the main header title 5 times to link your API key)";
+        typingBubble.textContent = "System configuration missing. (Admin: Press Ctrl + 0 + P to unlock system console)";
         return;
     }
 

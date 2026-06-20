@@ -1,6 +1,7 @@
 // --- INITIALIZE SUPABASE ---
 const SUPABASE_URL = "https://aaqhhcduyjdwhttopbty.supabase.co"; 
 const SUPABASE_ANON_KEY = "re_Dm53gWvg_MaKt87ZvCzGhqoqYn1F5HT7V"; 
+const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
 let conversationHistory = [];
 let vocabularyLearned = {}; 

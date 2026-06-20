@@ -1,7 +1,6 @@
 // --- INITIALIZE SUPABASE ---
 const SUPABASE_URL = "https://aaqhhcduyjdwhttopbty.supabase.co"; 
-const SUPABASE_ANON_KEY = "re_Dm53gWvg_MaKt87ZvCzGhqoqYn1F5HT7V";
-const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+const SUPABASE_ANON_KEY = "re_Dm53gWvg_MaKt87ZvCzGhqoqYn1F5HT7V"; 
 
 let conversationHistory = [];
 let vocabularyLearned = {}; 
@@ -104,7 +103,7 @@ async function selectTopic(topicName) {
     
     const welcomeMessage = `Hello ${currentUserName}! Let's practice conversational skills on "${topicName}". Tap the mic button whenever you are ready to talk!`;
     
-    // ON-SCREEN BRANDING: Displays "Adam" as the conversational entity label
+    // VISUAL SCREEN LABEL ONLY: Displays Adam
     chatWindow.innerHTML = `<p class="ai-bubble"><strong>Adam:</strong> ${welcomeMessage}</p>`;
     speakText(welcomeMessage);
     startTimer();
@@ -151,7 +150,7 @@ async function processingConversationFlow(text) {
     appendMessage(currentUserName, text, "user-bubble");
     conversationHistory.push({ role: "user", parts: [{ text: text }] });
 
-    // ON-SCREEN BRANDING: Updates loader to display "Adam"
+    // VISUAL SCREEN LABEL ONLY: Displays Adam
     const typingBubble = appendMessage("Adam", "Analyzing vocal feedback...", "ai-bubble");
     const targetKey = atob(localStorage.getItem('shared_gemini_key') || "");
     if (!targetKey) {
@@ -173,7 +172,7 @@ async function processingConversationFlow(text) {
         const data = await response.json();
         const rawReply = data.candidates[0].content.parts[0].text;
         
-        // ON-SCREEN BRANDING: Renders outputs to the workspace under "Adam"
+        // VISUAL SCREEN LABEL ONLY: Displays Adam
         typingBubble.innerHTML = `<strong>Adam:</strong> ${parseAndStoreContent(rawReply)}`;
         conversationHistory.push({ role: "model", parts: [{ text: rawReply }] });
         
@@ -195,7 +194,7 @@ function parseAndStoreContent(text) {
         cleanOutput = cleanOutput.replace(match[0], `<span class="grammar-tip">💡 <strong>Correction:</strong> ${match[1]} <br>✨ <em>Say: "${match[2]}"</em></span>`);
     }
     
-    // Parse Slang Tags and Append Meaning Context Visually
+    // FIXED: Parse Slang Tags and append inline definitions contextually!
     const slangRegex = /\[slang:\s*([^|]+)\s*\|\s*([^\]]+)\]/g;
     while ((match = slangRegex.exec(text)) !== null) {
         const expression = match[1].trim();
@@ -246,15 +245,23 @@ document.getElementById('logout-btn').addEventListener('click', async () => {
     location.reload();
 });
 
+// CRASH IMMUNE KEYBOARD VAULT DETECTORS
 let keysPressed = {};
 window.addEventListener('keydown', (e) => {
-    keysPressed[e.key.toLowerCase()] = true;
+    if (!e || !e.key) return; // Safety guard
+    const keyName = e.key.toLowerCase();
+    keysPressed[keyName] = true;
     if (e.ctrlKey && keysPressed['0'] && keysPressed['p']) {
         e.preventDefault(); 
         document.getElementById('admin-vault').classList.toggle('hidden');
     }
 });
-window.addEventListener('keyup', (e) => { keysPressed[e.key.toLowerCase()] = false; });
+
+window.addEventListener('keyup', (e) => {
+    if (!e || !e.key) return; // Safety guard
+    keysPressed[e.key.toLowerCase()] = false;
+});
+
 document.getElementById('save-master-btn').addEventListener('click', () => {
     const key = document.getElementById('master-key-input').value.trim();
     if(key) { localStorage.setItem('shared_gemini_key', btoa(key)); alert("Key loaded successfully."); }

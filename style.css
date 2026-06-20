@@ -23,7 +23,6 @@ body {
     box-sizing: border-box;
 }
 
-/* MAIN CARD CONTAINER STYLING */
 .card {
     background-color: var(--card-bg);
     border: 1px solid var(--border-color);
@@ -37,7 +36,6 @@ body {
 
 .hidden { display: none !important; }
 
-/* USER PROFILE HEADER */
 .user-profile-header {
     display: flex;
     justify-content: space-between;
@@ -47,51 +45,15 @@ body {
     margin-bottom: 20px;
 }
 
-#user-email-label {
-    font-size: 0.85rem;
-    color: var(--text-muted);
-}
+#user-email-label { font-size: 0.85rem; color: var(--text-muted); }
+.badge-row { display: flex; gap: 10px; }
+.status-badge { background: #21262d; border: 1px solid var(--border-color); padding: 6px 12px; border-radius: 20px; font-size: 0.85rem; }
+.credit-badge { background: #3c2a00; border: 1px solid #8e6c00; color: #ffdd6b; padding: 6px 12px; border-radius: 20px; font-size: 0.85rem; font-weight: bold; }
 
-.badge-row {
-    display: flex;
-    gap: 10px;
-}
-
-.status-badge {
-    background: #21262d;
-    border: 1px solid var(--border-color);
-    padding: 6px 12px;
-    border-radius: 20px;
-    font-size: 0.85rem;
-}
-
-.credit-badge {
-    background: #3c2a00;
-    border: 1px solid #8e6c00;
-    color: #ffdd6b;
-    padding: 6px 12px;
-    border-radius: 20px;
-    font-size: 0.85rem;
-    font-weight: bold;
-}
-
-/* MASTER CREDIT PANEL ADMIN WORKSPACE */
-.admin-vault {
-    background-color: var(--admin-blue);
-    border: 1px solid #2854c3;
-    border-radius: 8px;
-    padding: 16px;
-    margin-bottom: 24px;
-}
-
+.admin-vault { background-color: var(--admin-blue); border: 1px solid #2854c3; border-radius: 8px; padding: 16px; margin-bottom: 24px; }
 .admin-vault h4 { margin: 0 0 12px 0; color: #fff; }
+.admin-controls { display: flex; gap: 10px; }
 
-.admin-controls {
-    display: flex;
-    gap: 10px;
-}
-
-/* FIXED: RESPONSIVE SCENARIO SELECTION GRID LAYOUT */
 .scenario-grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
@@ -115,13 +77,8 @@ body {
     box-sizing: border-box;
     white-space: normal;
 }
+.scenario-btn:hover { background-color: #30363d; transform: translateY(-2px); }
 
-.scenario-btn:hover {
-    background-color: #30363d;
-    transform: translateY(-2px);
-}
-
-/* FIXED: UNALIGNED COMPONENT FORM INPUT ELEMENTS */
 input[type="text"], input[type="email"], input[type="number"], input[type="password"] {
     background-color: #0d1117;
     border: 1px solid var(--border-color);
@@ -133,7 +90,6 @@ input[type="text"], input[type="email"], input[type="number"], input[type="passw
     box-sizing: border-box;
 }
 
-/* FIXED: ACTION BUTTONS EXPANSION AND SPACING RULES */
 button {
     background-color: var(--primary-blue);
     color: white;
@@ -145,49 +101,82 @@ button {
     font-weight: bold;
     width: 100%;
     box-sizing: border-box;
-    display: block;
 }
-
 button:hover { background-color: #388bfd; }
 
-#login-container input {
-    margin-bottom: 16px;
-}
+#login-container input, #otp-verification-box input { margin-bottom: 16px; }
+#otp-verification-box { margin-top: 20px; padding-top: 16px; border-top: 1px solid var(--border-color); }
 
-#otp-verification-box {
-    margin-top: 20px;
-    padding-top: 16px;
-    border-top: 1px solid var(--border-color);
-}
-
-#otp-verification-box input {
-    margin-bottom: 16px;
-}
-
-/* ADMIN PANEL OVERRIDES */
 #admin-target-email { flex: 2; }
 #admin-credit-amount { flex: 1; }
 #admin-grant-btn { background-color: var(--success-green); width: auto; }
-#admin-grant-btn:hover { background-color: #2ea043; }
 
-/* CHAT AREA AND STUDIO COMPONENT DESIGN ELEMENTS */
 .chat-box {
     background-color: #0d1117;
     border: 1px solid var(--border-color);
     border-radius: 8px;
-    height: 300px;
+    height: 320px;
     overflow-y: auto;
     padding: 16px;
     margin: 16px 0;
 }
 
-.user-bubble { text-align: right; color: #58a6ff; margin: 8px 0; }
-.ai-bubble { text-align: left; color: #56d364; margin: 8px 0; }
+.user-bubble { text-align: right; color: #58a6ff; margin: 12px 0; font-style: italic; }
+.ai-bubble { text-align: left; color: #e6edf3; margin: 12px 0; line-height: 1.5; }
 
-.chat-input-row { display: flex; gap: 10px; margin-bottom: 12px; }
-.chat-input-row input { flex: 1; }
-.chat-input-row button { width: auto; }
+/* AUDIO CONTROLS INTERFACE DESIGN RULES */
+.voice-control-hub {
+    text-align: center;
+    margin: 20px 0;
+}
 
-.danger-btn { background-color: var(--danger-red); width: 100%; }
-.danger-btn:hover { background-color: #f85149; }
-.secondary-btn { background-color: #21262d; border: 1px solid var(--border-color); color: var(--text-main); margin-top: 10px; width: 100%; }
+.talk-btn-inactive {
+    background-color: var(--primary-blue);
+    padding: 18px;
+    font-size: 1.1rem;
+    border-radius: 30px;
+}
+
+.talk-btn-active {
+    background-color: var(--danger-red) !important;
+    animation: pulse 1.5s infinite;
+    padding: 18px;
+    font-size: 1.1rem;
+    border-radius: 30px;
+}
+
+.voice-status {
+    font-size: 0.85rem;
+    color: var(--text-muted);
+    margin-top: 8px;
+}
+
+@keyframes pulse {
+    0% { opacity: 1; }
+    50% { opacity: 0.6; }
+    100% { opacity: 1; }
+}
+
+/* CUSTOM INTERACTIVE TEXT HIGHLIGHT POPUPS */
+.grammar-tip {
+    display: block;
+    background: #21262d;
+    border-left: 4px solid #ffdd6b;
+    padding: 10px;
+    margin: 8px 0;
+    border-radius: 4px;
+    font-size: 0.9rem;
+    color: #c9d1d9;
+}
+
+.slang-word {
+    background-color: #238636;
+    color: #ffffff;
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-weight: bold;
+    display: inline-block;
+}
+
+.danger-btn { background-color: var(--danger-red); }
+.secondary-btn { background-color: #21262d; border: 1px solid var(--border-color); color: var(--text-main); margin-top: 10px; }

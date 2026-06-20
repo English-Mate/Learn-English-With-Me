@@ -18,6 +18,32 @@ body {
     text-align: center;
 }
 
+.topic-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 15px;
+    margin-top: 20px;
+}
+
+.topic-btn {
+    background-color: #f8fafc;
+    border: 2px solid #e2e8f0;
+    padding: 20px;
+    border-radius: 12px;
+    font-size: 1rem;
+    font-weight: 600;
+    color: #334155;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.topic-btn:hover {
+    background-color: #e0f2fe;
+    border-color: #38bdf8;
+    color: #0369a1;
+    transform: translateY(-2px);
+}
+
 .podcast-header {
     display: flex;
     justify-content: space-between;
@@ -27,7 +53,7 @@ body {
 
 .podcast-header h2 {
     margin: 0;
-    font-size: 1.5rem;
+    font-size: 1.4rem;
     color: #1e293b;
 }
 
@@ -58,6 +84,18 @@ body {
     font-weight: 600;
     padding: 2px 4px;
     border-radius: 4px;
+}
+
+.grammar-tip {
+    display: block;
+    background-color: #fee2e2;
+    border-left: 4px solid #ef4444;
+    padding: 12px;
+    margin: 8px 0 15px 0;
+    border-radius: 6px;
+    font-size: 0.95rem;
+    color: #991b1b;
+    line-height: 1.4;
 }
 
 .input-area {

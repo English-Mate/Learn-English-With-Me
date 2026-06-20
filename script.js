@@ -1,11 +1,12 @@
 // --- INITIALIZE SUPABASE ---
-onst SUPABASE_URL = "https://aaqhhcduyjdwhttopbty.supabase.co";  
+const SUPABASE_URL = "https://aaqhhcduyjdwhttopbty.supabase.co";  
 const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFhcWhoY2R1eWpkd2h0dG9wYnR5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE5NDA0MTUsImV4cCI6MjA5NzUxNjQxNX0.37LMqYv-O58IWLz8sIivJ5PzdCd-jQHv0BsD0pF7sT4"; 
+const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
 let conversationHistory = [];
 let vocabularyLearned = {}; 
-let timerInterval; // 67 six-sevem
+let timerInterval;
 let timeLeft = 2 * 60 * 60; 
 let selectedTopicContext = "";
 let currentUserName = "Student";
@@ -13,7 +14,7 @@ let currentUserEmail = "";
 let currentUserCredits = 6;
 const ADMIN_EMAIL = "yuvansood1234@gmail.com";
 
-// SPEECH RECOGNITION INTERFACE INTEGRATION
+// SPEECH ENGINE CONNECTIVITY INTERFACE
 const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
 let recognition = null;
 let isRecording = false;
@@ -36,7 +37,7 @@ const talkBtn = document.getElementById('talk-btn');
 const voiceStatusLabel = document.getElementById('voice-status-label');
 const chatWindow = document.getElementById('chat-window');
 
-// STEP 1: Otp Auth Core
+// STEP 1: Request OTP Access Link
 document.getElementById('send-otp-btn').addEventListener('click', async () => {
     const email = emailInput.value.trim().toLowerCase();
     if (!email || !email.includes('@')) return alert("Please enter a valid email address.");
@@ -46,7 +47,7 @@ document.getElementById('send-otp-btn').addEventListener('click', async () => {
     if (otpVerificationBox) otpVerificationBox.classList.remove('hidden');
 });
 
-// STEP 2: Token verification
+// STEP 2: Verify Log-in Key
 document.getElementById('verify-otp-btn').addEventListener('click', async () => {
     const email = emailInput.value.trim().toLowerCase();
     const token = otpInput.value.trim();
@@ -108,7 +109,7 @@ async function selectTopic(topicName) {
     startTimer();
 }
 
-// AUDIO EVENT LISTENERS AND PROCESSING HANDLERS
+// SPEECH EVENT ENGINE CONTROL HOOKS
 if (recognition) {
     recognition.onstart = () => {
         isRecording = true;
@@ -128,7 +129,7 @@ if (recognition) {
 }
 
 talkBtn.addEventListener('click', () => {
-    if (!recognition) return alert("Web Speech Engine not supported on this browser browser. Use Chrome or Safari.");
+    if (!recognition) return alert("Web Speech Engine not supported on this browser. Use Chrome or Safari.");
     window.speechSynthesis.cancel();
     if (isRecording) {
         recognition.stop();
@@ -144,6 +145,7 @@ function resetVoiceInterface() {
     voiceStatusLabel.textContent = "Microphone Idle";
 }
 
+// MAIN CONVERSATION ENGINE PIPELINE
 async function processingConversationFlow(text) {
     appendMessage(currentUserName, text, "user-bubble");
     conversationHistory.push({ role: "user", parts: [{ text: text }] });
@@ -155,8 +157,7 @@ async function processingConversationFlow(text) {
         return;
     }
 
-    // STRICT INSTRUCTIONS: Tells Gemini to return [grammar: ...] and [slang: ...] formats
-    const explicitInstruction = `You are an conversational language voice partner chatting with ${currentUserName}. Current topic context: ${selectedTopicContext}. Speak in conversational English prose. If the user makes a structural mistake, inject exactly one bracket tip: [grammar: explain error briefly | provide correct short sentence]. If answering naturally, include exactly one native slang idiom inside brackets: [slang: expression | short meaning]. Do not use raw markdown blocks like "Tip:" or bold text for idioms outside these exact bracket parameters. Everything outside the brackets must be short prose spoken aloud.`;
+    const explicitInstruction = `You are a conversational language voice partner chatting with ${currentUserName}. Current topic context: ${selectedTopicContext}. Speak in conversational English prose. If the user makes a structural mistake, inject exactly one bracket tip: [grammar: explain error briefly | provide correct short sentence]. If answering naturally, include exactly one native slang idiom inside brackets: [slang: expression | short meaning]. Do not use raw markdown blocks like "Tip:" or bold text for idioms outside these exact bracket parameters. Everything outside the brackets must be short prose spoken aloud.`;
 
     try {
         const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${targetKey}`, {
@@ -173,7 +174,6 @@ async function processingConversationFlow(text) {
         typingBubble.innerHTML = `<strong>Gemini:</strong> ${parseAndStoreContent(rawReply)}`;
         conversationHistory.push({ role: "model", parts: [{ text: rawReply }] });
         
-        // Strip tags completely out of synthesized audio speech output
         let voiceCleanText = rawReply.replace(/\[grammar:[^\]]+\]/g, "").replace(/\[slang:\s*([^|]+)\s*\|\s*[^\]]+\]/g, "$1");
         speakText(voiceCleanText.trim());
     } catch (e) {

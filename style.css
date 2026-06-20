@@ -1,365 +1,166 @@
-/* ==========================================================================
-   MEMRISE DARK EDITION - CORE STYLES
-   ========================================================================== */
 :root {
-    --bg-main: #0f172a;          /* Deep Obsidian/Slate 900 */
-    --bg-card: #1e293b;          /* Dark Slate 800 */
-    --bg-input: #0f172a;         /* Input Background */
-    --text-main: #f8fafc;        /* Off-white 50 */
-    --text-muted: #94a3b8;       /* Cool Gray 400 */
-    --primary: #6366f1;          /* Indigo 500 (Brand Accent) */
-    --primary-hover: #4f46e5;    /* Indigo 600 */
-    --success: #10b981;          /* Emerald Green */
-    --success-hover: #059669;
-    --danger: #ef4444;           /* Crimson Red */
-    --danger-hover: #dc2626;
-    --gold-bg: #78350f;          /* Rich Amber Dark */
-    --gold-text: #fef08a;        /* Vibrant Yellow Gold */
-    --chat-ai: #334155;          /* Slate 700 */
-    --chat-user: #312e81;        /* Deep Indigo Dark */
-}
-
-* {
-    box-sizing: border-box;
-    margin: 0;
-    padding: 0;
-    font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+    --bg-dark: #0d1117;
+    --card-bg: #161b22;
+    --primary-blue: #1f6feb;
+    --admin-blue: #143585;
+    --success-green: #238636;
+    --danger-red: #da3633;
+    --text-main: #c9d1d9;
+    --text-muted: #8b949e;
+    --border-color: #30363d;
 }
 
 body {
-    background-color: var(--bg-main);
+    background-color: var(--bg-dark);
     color: var(--text-main);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
     display: flex;
-    flex-direction: column;
-    align-items: center;
     justify-content: center;
+    align-items: center;
     min-height: 100vh;
+    margin: 0;
     padding: 20px;
+    box-sizing: border-box;
 }
 
-/* Helper Utilities */
-.hidden {
-    display: none !important;
-}
-
-/* ==========================================================================
-   APP CONTAINERS & CARDS
-   ========================================================================== */
-.container {
-    background-color: var(--bg-card);
+.card {
+    background-color: var(--card-bg);
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+    padding: 24px;
     width: 100%;
-    max-width: 600px;
-    border-radius: 24px;         /* Chunky, friendly app corners */
-    padding: 30px;
-    box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.3), 0 8px 10px -6px rgba(0, 0, 0, 0.3);
-    border: 1px solid #334155;
-    animation: fadeIn 0.4s ease-out;
+    max-width: 650px;
+    box-sizing: border-box;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.5);
 }
 
-@keyframes fadeIn {
-    from { opacity: 0; transform: translateY(10px); }
-    to { opacity: 1; transform: translateY(0); }
+.hidden { display: none !important; }
+
+.user-profile-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid var(--border-color);
+    padding-bottom: 16px;
+    margin-bottom: 20px;
 }
 
-h2, h3 {
-    font-weight: 700;
-    letter-spacing: -0.5px;
-    margin-bottom: 8px;
-    text-align: center;
-}
-
-p {
+#user-email-label {
+    font-size: 0.85rem;
     color: var(--text-muted);
-    font-size: 0.95rem;
-    line-height: 1.5;
-    text-align: center;
-    margin-bottom: 20px;
 }
 
-/* ==========================================================================
-   GAMIFIED PROFILE BAR & ADMIN PANEL
-   ========================================================================== */
-.profile-header-bar {
+.badge-row {
     display: flex;
-    justify-content: space-between;
-    align-items: center;
-    background: #1e293b !important;
-    padding: 16px !important;
-    border-radius: 16px !important;
-    margin-bottom: 25px !important;
-    border: 1px solid #475569 !important;
+    gap: 10px;
 }
 
-.profile-header-bar strong {
-    color: var(--text-main);
-    font-size: 1.1rem;
+.status-badge {
+    background: #21262d;
+    border: 1px solid var(--border-color);
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-size: 0.85rem;
 }
 
-#credit-badge {
-    background-color: var(--gold-bg) !important;
-    color: var(--gold-text) !important;
-    font-weight: 700;
-    border: 1px solid #b45309;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+.credit-badge {
+    background: #3c2a00;
+    border: 1px solid #8e6c00;
+    color: #ffdd6b;
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-size: 0.85rem;
+    font-weight: bold;
 }
 
-/* Admin Panel Styling */
-#super-admin-panel {
-    background: #1e3a8a !important;
-    border: 1px solid #3b82f6 !important;
-    color: #eff6ff;
+.admin-vault {
+    background-color: var(--admin-blue);
+    border: 1px solid #2854c3;
+    border-radius: 8px;
+    padding: 16px;
+    margin-bottom: 24px;
 }
 
-/* ==========================================================================
-   FORM CONTROLS & INPUTS
-   ========================================================================== */
-input[type="text"],
-input[type="email"],
-input[type="password"],
-input[type="number"] {
-    width: 100%;
-    padding: 14px 18px;
-    border-radius: 14px;
-    background-color: var(--bg-input);
-    border: 2px solid #334155;
-    color: var(--text-main);
-    font-size: 1rem;
-    transition: all 0.2s ease;
+.admin-vault h4 { margin: 0 0 12px 0; color: #fff; }
+
+.admin-controls {
+    display: flex;
+    gap: 10px;
 }
 
-input:focus {
-    outline: none;
-    border-color: var(--primary);
-    box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.2);
-}
-
-/* ==========================================================================
-   BUTTONS (MEMRISE TACTILE STYLE)
-   ========================================================================== */
-button, .topic-btn {
-    cursor: pointer;
-    font-size: 1rem;
-    font-weight: 700;
-    padding: 14px 20px;
-    border-radius: 14px;
-    border: none;
-    color: #ffffff;
-    background-color: var(--primary);
-    transition: all 0.15s ease;
-    box-shadow: 0 4px 0px #4338ca; /* Tactile 3D pop effect */
-    position: relative;
-}
-
-button:hover, .topic-btn:hover {
-    background-color: var(--primary-hover);
-    transform: translateY(1px);
-    box-shadow: 0 3px 0px #4338ca;
-}
-
-button:active, .topic-btn:active {
-    transform: translateY(4px);
-    box-shadow: 0 0px 0px transparent;
-}
-
-/* Success Button Variant */
-#signup-btn, #verify-otp-btn, #admin-grant-btn {
-    background-color: var(--success);
-    box-shadow: 0 4px 0px #047857;
-}
-#signup-btn:hover, #verify-otp-btn:hover, #admin-grant-btn:hover {
-    background-color: var(--success-hover);
-    box-shadow: 0 3px 0px #047857;
-}
-
-/* Danger Button Variant */
-.danger-btn {
-    background-color: var(--danger);
-    box-shadow: 0 4px 0px #b91c1c;
-    width: 100%;
-    margin-top: 15px;
-}
-.danger-btn:hover {
-    background-color: var(--danger-hover);
-    box-shadow: 0 3px 0px #b91c1c;
-}
-
-/* ==========================================================================
-   GRID LAYOUT - SCENARIO SELECTION
-   ========================================================================== */
-.topic-grid {
+/* RESPONSIVE SCENARIO SELECTION GRID */
+.scenario-grid {
     display: grid;
-    grid-template-columns: 100%;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
     gap: 14px;
-    margin-top: 20px;
-}
-
-@media (min-width: 480px) {
-    .topic-grid {
-        grid-template-columns: repeat(2, 100%);
-    }
-}
-
-.topic-btn {
-    background-color: #334155;
-    border: 1px solid #475569;
-    box-shadow: 0 4px 0px #1e293b;
-    text-align: left;
-    display: flex;
-    align-items: center;
-    padding: 18px;
-    font-size: 1.05rem;
-}
-
-.topic-btn:hover {
-    background-color: #475569;
-    box-shadow: 0 3px 0px #1e293b;
-}
-
-/* ==========================================================================
-   CONVERSATION WINDOW & CHAT BUBBLES
-   ========================================================================== */
-.podcast-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    border-bottom: 2px solid #334155;
-    padding-bottom: 15px;
-    margin-bottom: 20px;
-}
-
-#podcast-title {
-    text-align: left;
-    font-size: 1.3rem;
-}
-
-#timer {
-    background: #ef4444;
-    padding: 4px 10px;
-    border-radius: 8px;
-    font-weight: 700;
-    font-family: monospace;
-    font-size: 1.1rem;
-}
-
-#chat-window {
-    height: 350px;
-    overflow-y: auto;
-    border-radius: 16px;
-    background-color: #0f172a;
-    padding: 15px;
-    display: flex;
-    flex-direction: column;
-    gap: 12px;
-    border: 1px solid #334155;
-    margin-bottom: 15px;
-}
-
-/* Custom Scrollbar */
-#chat-window::-webkit-scrollbar {
-    width: 6px;
-}
-#chat-window::-webkit-scrollbar-thumb {
-    background-color: #475569;
-    border-radius: 10px;
-}
-
-/* Chat Bubble UI */
-.user-bubble, .ai-bubble {
-    max-width: 85%;
-    padding: 12px 16px;
-    border-radius: 18px;
-    font-size: 0.98rem;
-    line-height: 1.4;
-    word-wrap: break-word;
-    text-align: left;
-    margin-bottom: 0;
-}
-
-.user-bubble {
-    background-color: var(--chat-user);
-    align-self: flex-end;
-    border-bottom-right-radius: 4px;
-    border: 1px solid #4338ca;
-}
-
-.ai-bubble {
-    background-color: var(--chat-ai);
-    align-self: flex-start;
-    border-bottom-left-radius: 4px;
-    border: 1px solid #475569;
-}
-
-/* Input Row for messaging */
-.input-area {
-    display: flex;
-    gap: 10px;
-    margin-bottom: 10px;
-}
-
-.input-area input {
-    flex: 1;
-}
-
-/* ==========================================================================
-   GRAMMAR TIPS & SLANG INTELLIGENCE POPUPS
-   ========================================================================== */
-.grammar-tip {
-    display: block;
-    background-color: #7f1d1d;
-    border-left: 4px solid #ef4444;
-    padding: 10px 14px;
-    border-radius: 8px;
-    margin-top: 8px;
-    font-size: 0.9rem;
-    color: #fca5a5;
-}
-
-.grammar-tip em {
-    color: #fecaca;
-    font-weight: 600;
-}
-
-.slang-word {
-    background-color: #1e3a8a;
-    color: #93c5fd;
-    padding: 2px 6px;
-    border-radius: 6px;
-    font-weight: 600;
-    cursor: help;
-    border-bottom: 2px dashed #3b82f6;
-    transition: background 0.2s;
-}
-
-.slang-word:hover {
-    background-color: #2563eb;
-    color: #ffffff;
-}
-
-/* ==========================================================================
-   SUMMARY & DEV CONSOLE
-   ========================================================================== */
-#slang-summary-list {
-    list-style: none;
-    text-align: left;
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
+    width: 100%;
+    box-sizing: border-box;
     margin: 20px 0;
 }
 
-#slang-summary-list li {
-    background: #334155;
-    padding: 12px;
-    border-radius: 10px;
-    border-left: 4px solid var(--primary);
+.scenario-btn {
+    background-color: #21262d;
+    border: 1px solid var(--border-color);
+    color: var(--text-main);
+    padding: 16px;
+    border-radius: 8px;
+    font-size: 1rem;
+    cursor: pointer;
+    text-align: left;
+    transition: background 0.2s, transform 0.1s;
+    width: 100%;
+    box-sizing: border-box;
+    white-space: normal;
 }
 
-#admin-vault {
-    background: #1e293b;
-    border: 1px dashed #ef4444;
-    padding: 15px;
-    border-radius: 12px;
-    margin-top: 25px;
-    width: 100%;
-    max-width: 600px;
+.scenario-btn:hover {
+    background-color: #30363d;
+    transform: translateY(-2px);
 }
+
+input[type="text"], input[type="email"], input[type="number"], input[type="password"] {
+    background-color: #0d1117;
+    border: 1px solid var(--border-color);
+    color: var(--text-main);
+    padding: 12px;
+    border-radius: 6px;
+    font-size: 1rem;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+button {
+    background-color: var(--primary-blue);
+    color: white;
+    border: none;
+    padding: 12px 20px;
+    border-radius: 6px;
+    font-size: 1rem;
+    cursor: pointer;
+    font-weight: bold;
+}
+
+button:hover { background-color: #388bfd; }
+
+#admin-target-email { flex: 2; }
+#admin-credit-amount { flex: 1; }
+#admin-grant-btn { background-color: var(--success-green); }
+#admin-grant-btn:hover { background-color: #2ea043; }
+
+.chat-box {
+    background-color: #0d1117;
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    height: 300px;
+    overflow-y: auto;
+    padding: 16px;
+    margin: 16px 0;
+}
+
+.user-bubble { text-align: right; color: #58a6ff; margin: 8px 0; }
+.ai-bubble { text-align: left; color: #56d364; margin: 8px 0; }
+
+.chat-input-row { display: flex; gap: 10px; margin-bottom: 12px; }
+.danger-btn { background-color: var(--danger-red); width: 100%; }
+.danger-btn:hover { background-color: #f85149; }
+.secondary-btn { background-color: #21262d; border: 1px solid var(--border-color); color: var(--text-main); margin-top: 10px; width: 100%; }

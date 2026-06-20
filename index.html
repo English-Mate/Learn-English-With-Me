@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Memrise made by yuvan</title>
+    <title>AI Voice Scenario Studio</title>
     <link rel="stylesheet" href="style.css">
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
@@ -65,11 +65,14 @@
             <h3 id="active-topic">Scenario Context</h3>
             <span id="timer">02:00:00</span>
         </div>
+        
         <div id="chat-window" class="chat-box"></div>
-        <div class="chat-input-row">
-            <input type="text" id="user-input" placeholder="Type your response here...">
-            <button id="send-btn">Send</button>
+        
+        <div class="voice-control-hub">
+            <button id="talk-btn" class="talk-btn-inactive">🎤 Tap to Speak</button>
+            <p id="voice-status-label" class="voice-status">Microphone Idle</p>
         </div>
+        
         <button id="end-btn" class="danger-btn">End Session & Review</button>
     </div>
 

@@ -91,7 +91,7 @@ input[type="text"], input[type="email"], input[type="number"], input[type="passw
     box-sizing: border-box;
 }
 
-/* GLOBAL FULL-WIDTH BUTTON OVERRIDES FOR ALIGNMENT */
+/* GLOBAL ALIGNMENT FOR BUTTONS */
 button {
     background-color: var(--primary-blue);
     color: white;
@@ -128,7 +128,7 @@ button:hover { background-color: #388bfd; }
 .user-bubble { text-align: right; color: #58a6ff; margin: 12px 0; font-style: italic; }
 .ai-bubble { text-align: left; color: #e6edf3; margin: 12px 0; line-height: 1.5; }
 
-/* TAP-TO-TALK HUD STYLING */
+/* TAP-TO-TALK ENGINE DISPLAY RULES */
 .voice-control-hub {
     text-align: center;
     margin: 20px 0;
@@ -161,7 +161,7 @@ button:hover { background-color: #388bfd; }
     100% { opacity: 1; }
 }
 
-/* INTERACTIVE HIGHLIGHT CUSTOM CHIPS */
+/* INTERACTIVE DISPLAY CHIPS */
 .grammar-tip {
     display: block;
     background: #21262d;

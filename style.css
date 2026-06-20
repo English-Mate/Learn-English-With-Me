@@ -54,6 +54,7 @@ body {
 .admin-vault h4 { margin: 0 0 12px 0; color: #fff; }
 .admin-controls { display: flex; gap: 10px; }
 
+/* SCENARIO SELECTION GRID */
 .scenario-grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
@@ -90,6 +91,7 @@ input[type="text"], input[type="email"], input[type="number"], input[type="passw
     box-sizing: border-box;
 }
 
+/* GLOBAL FULL-WIDTH BUTTON OVERRIDES FOR ALIGNMENT */
 button {
     background-color: var(--primary-blue);
     color: white;
@@ -101,6 +103,7 @@ button {
     font-weight: bold;
     width: 100%;
     box-sizing: border-box;
+    display: block;
 }
 button:hover { background-color: #388bfd; }
 
@@ -110,6 +113,7 @@ button:hover { background-color: #388bfd; }
 #admin-target-email { flex: 2; }
 #admin-credit-amount { flex: 1; }
 #admin-grant-btn { background-color: var(--success-green); width: auto; }
+#admin-grant-btn:hover { background-color: #2ea043; }
 
 .chat-box {
     background-color: #0d1117;
@@ -124,7 +128,7 @@ button:hover { background-color: #388bfd; }
 .user-bubble { text-align: right; color: #58a6ff; margin: 12px 0; font-style: italic; }
 .ai-bubble { text-align: left; color: #e6edf3; margin: 12px 0; line-height: 1.5; }
 
-/* AUDIO CONTROLS INTERFACE DESIGN RULES */
+/* TAP-TO-TALK HUD STYLING */
 .voice-control-hub {
     text-align: center;
     margin: 20px 0;
@@ -157,7 +161,7 @@ button:hover { background-color: #388bfd; }
     100% { opacity: 1; }
 }
 
-/* CUSTOM INTERACTIVE TEXT HIGHLIGHT POPUPS */
+/* INTERACTIVE HIGHLIGHT CUSTOM CHIPS */
 .grammar-tip {
     display: block;
     background: #21262d;
@@ -179,4 +183,5 @@ button:hover { background-color: #388bfd; }
 }
 
 .danger-btn { background-color: var(--danger-red); }
+.danger-btn:hover { background-color: #f85149; }
 .secondary-btn { background-color: #21262d; border: 1px solid var(--border-color); color: var(--text-main); margin-top: 10px; }

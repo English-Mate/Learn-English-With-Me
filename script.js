@@ -2,6 +2,7 @@
 const SUPABASE_URL = "https://aaqhhcduyjdwhttopbty.supabase.co"; 
 const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFhcWhoY2R1eWpkd2h0dG9wYnR5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE5NDA0MTUsImV4cCI6MjA5NzUxNjQxNX0.37LMqYv-O58IWLz8sIivJ5PzdCd-jQHv0BsD0pF7sT4"; 
 
+// 7-DAY AUTH EXPIRY PERSISTENCE ENGINE INITIALIZER
 const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
     auth: {
         persistSession: true,
@@ -43,6 +44,14 @@ const talkBtn = document.getElementById('talk-btn');
 const voiceStatusLabel = document.getElementById('voice-status-label');
 const chatWindow = document.getElementById('chat-window');
 
+// AUTO LOGIN SYNC FOR RETURNING VALID SESSIONS (7 DAYS PERSISTED)
+window.addEventListener('DOMContentLoaded', async () => {
+    const { data } = await supabaseClient.auth.getSession();
+    if (data?.session?.user) {
+        await syncUserProfile(data.session.user.email);
+    }
+});
+
 // STEP 1: Request OTP Security Link
 document.getElementById('send-otp-btn').addEventListener('click', async () => {
     const email = emailInput.value.trim().toLowerCase();
@@ -63,19 +72,42 @@ document.getElementById('verify-otp-btn').addEventListener('click', async () => 
     if (data.user) await syncUserProfile(data.user.email);
 });
 
+// FIXED DATA PAYLOAD SYNCHRONIZATION 
 async function syncUserProfile(email) {
     currentUserEmail = email;
     currentUserName = email.split('@')[0];
-    let { data: profile } = await supabaseClient.from('profiles').select('*').eq('email', currentUserEmail).maybeSingle();
+    
+    const { data: authData } = await supabaseClient.auth.getUser();
+    const userId = authData?.user?.id;
+    if (!userId) return alert("Authentication session sync failure.");
+
+    let { data: profile } = await supabaseClient.from('profiles').select('*').eq('id', userId).maybeSingle();
+    
     if (!profile) {
         const initialCredits = (currentUserEmail === ADMIN_EMAIL) ? 999999 : 6;
-        const { data: newProfile } = await supabaseClient.from('profiles').insert([{ username: currentUserName, email: currentUserEmail, credits: initialCredits }]).select().single();
+        const { data: newProfile, error: insertError } = await supabaseClient
+            .from('profiles')
+            .insert([{ 
+                id: userId,
+                username: currentUserName, 
+                email: currentUserEmail, 
+                credits: initialCredits 
+            }])
+            .select()
+            .maybeSingle();
+            
+        if (insertError) {
+            console.error("Profile Generation Fault:", insertError);
+            return alert("Profile row provisioning error: " + insertError.message);
+        }
         profile = newProfile;
     }
+    
     currentUserCredits = profile ? profile.credits : 6;
     document.getElementById('display-username').textContent = currentUserName;
     document.getElementById('user-email-label').textContent = currentUserEmail;
     updateCreditDisplay();
+    
     if (currentUserEmail === ADMIN_EMAIL) superAdminPanel.classList.remove('hidden');
     loginContainer.classList.add('hidden');
     topicContainer.classList.remove('hidden');
@@ -102,7 +134,8 @@ async function selectTopic(topicName) {
     if (!isAdmin) {
         currentUserCredits -= 2;
         updateCreditDisplay();
-        await supabaseClient.from('profiles').update({ credits: currentUserCredits }).eq('email', currentUserEmail);
+        const { data: authData } = await supabaseClient.auth.getUser();
+        await supabaseClient.from('profiles').update({ credits: currentUserCredits }).eq('id', authData.user.id);
     }
     selectedTopicContext = topicName;
     document.getElementById('topic-container').classList.add('hidden');
@@ -110,8 +143,6 @@ async function selectTopic(topicName) {
     document.getElementById('active-topic').textContent = `Voice Context: ${topicName}`;
     
     const welcomeMessage = `Hello ${currentUserName}! Let's practice conversational skills on "${topicName}". Tap the mic button whenever you are ready to talk!`;
-    
-    // VISUAL SCREEN LABEL ONLY: Displays Adam
     chatWindow.innerHTML = `<p class="ai-bubble"><strong>Adam:</strong> ${welcomeMessage}</p>`;
     speakText(welcomeMessage);
     startTimer();
@@ -158,7 +189,6 @@ async function processingConversationFlow(text) {
     appendMessage(currentUserName, text, "user-bubble");
     conversationHistory.push({ role: "user", parts: [{ text: text }] });
 
-    // VISUAL SCREEN LABEL ONLY: Displays Adam
     const typingBubble = appendMessage("Adam", "Analyzing vocal feedback...", "ai-bubble");
     const targetKey = atob(localStorage.getItem('shared_gemini_key') || "");
     if (!targetKey) {
@@ -180,7 +210,6 @@ async function processingConversationFlow(text) {
         const data = await response.json();
         const rawReply = data.candidates[0].content.parts[0].text;
         
-        // VISUAL SCREEN LABEL ONLY: Displays Adam
         typingBubble.innerHTML = `<strong>Adam:</strong> ${parseAndStoreContent(rawReply)}`;
         conversationHistory.push({ role: "model", parts: [{ text: rawReply }] });
         
@@ -191,23 +220,19 @@ async function processingConversationFlow(text) {
     }
 }
 
-// INLINE STRUCTURAL PARSING AND DISPLAY INJECTIONS
 function parseAndStoreContent(text) {
     let cleanOutput = text;
     
-    // Parse Grammar Tags
     const grammarRegex = /\[grammar:\s*([^|]+)\s*\|\s*([^\]]+)\]/g;
     let match;
     while ((match = grammarRegex.exec(text)) !== null) {
         cleanOutput = cleanOutput.replace(match[0], `<span class="grammar-tip">💡 <strong>Correction:</strong> ${match[1]} <br>✨ <em>Say: "${match[2]}"</em></span>`);
     }
     
-    // FIXED: Parse Slang Tags and append inline definitions contextually!
     const slangRegex = /\[slang:\s*([^|]+)\s*\|\s*([^\]]+)\]/g;
     while ((match = slangRegex.exec(text)) !== null) {
         const expression = match[1].trim();
         const definition = match[2].trim();
-        
         vocabularyLearned[expression] = definition;
         cleanOutput = cleanOutput.replace(match[0], `<span class="slang-word" title="${definition}">${expression}</span> <i style="color: var(--text-muted); font-size: 0.9rem;">(${definition})</i>`);
     }
@@ -253,10 +278,10 @@ document.getElementById('logout-btn').addEventListener('click', async () => {
     location.reload();
 });
 
-// CRASH IMMUNE KEYBOARD VAULT DETECTORS
+// CRASH-IMMUNE KEYBOARD VAULT DETECTORS
 let keysPressed = {};
 window.addEventListener('keydown', (e) => {
-    if (!e || !e.key) return; // Safety guard
+    if (!e || !e.key) return; 
     const keyName = e.key.toLowerCase();
     keysPressed[keyName] = true;
     if (e.ctrlKey && keysPressed['0'] && keysPressed['p']) {
@@ -266,7 +291,7 @@ window.addEventListener('keydown', (e) => {
 });
 
 window.addEventListener('keyup', (e) => {
-    if (!e || !e.key) return; // Safety guard
+    if (!e || !e.key) return; 
     keysPressed[e.key.toLowerCase()] = false;
 });
 

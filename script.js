@@ -1,14 +1,13 @@
-// --- NO AUTH INITIALIZATION ---
+
 let conversationHistory = [];
 let vocabularyLearned = {}; 
 let timerInterval;
 let timeLeft = 2 * 60 * 60; 
 let selectedTopicContext = "";
 
-// Locally set profile values since login is removed
 let currentUserName = "Student";
-let currentUserEmail = "yuvansood1234@gmail.com"; // Set as admin to grant infinite credits automatically
-let currentUserCredits = 999999;
+let currentUserEmail = "Your Name"; 
+let currentUserCredits = 999999; 
 
 // SPEECH AUDIO CONNECTIONS
 const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
@@ -31,14 +30,11 @@ const chatWindow = document.getElementById('chat-window');
 
 // INITIALIZE DIRECTLY ON PAGE LOAD
 window.addEventListener('DOMContentLoaded', () => {
-    // Automatically load app values on startup
     document.getElementById('display-username').textContent = currentUserName;
     document.getElementById('user-email-label').textContent = currentUserEmail;
-    
-    // Set to Infinite representation since email matches admin logic
     creditBadge.textContent = "🪙 Credits: Infinite ∞";
     
-    // Instantly reveal the studio topics panel
+    // Instantly show the dashboard topics grid
     topicContainer.classList.remove('hidden');
 });
 
@@ -85,17 +81,21 @@ talkBtn.addEventListener('click', () => {
 
 function resetVoiceInterface() {
     isRecording = false;
-    talkBtn.textContent = "🎤 Tap to Speak";
+    talkBtn.textContent = " Tap to Speak";
     talkBtn.className = "talk-btn-inactive";
     voiceStatusLabel.textContent = "Microphone Idle";
 }
 
-// PROCESSING CORE SYSTEM FLOW
+// --- CORE SYSTEM FLOW ROUTING TO AGNES AI GATEWAY ---
 async function processingConversationFlow(text) {
     appendMessage(currentUserName, text, "user-bubble");
-    conversationHistory.push({ role: "user", parts: [{ text: text }] });
+    
+    // Add user turn into OpenAI-standard context structure
+    conversationHistory.push({ role: "user", content: text });
 
     const typingBubble = appendMessage("Adam", "Analyzing vocal feedback...", "ai-bubble");
+    
+    // Decrypt configuration vault token from browser cache
     const targetKey = atob(localStorage.getItem('shared_gemini_key') || "");
     if (!targetKey) {
         typingBubble.textContent = "Configuration Key Offline. (Ctrl + 0 + P)";
@@ -104,25 +104,36 @@ async function processingConversationFlow(text) {
 
     const explicitInstruction = `You are a conversational language voice partner chatting with ${currentUserName}. Current topic context: ${selectedTopicContext}. Speak in conversational English prose. If the user makes a structural mistake, inject exactly one bracket tip: [grammar: explain error briefly | provide correct short sentence]. If answering naturally, include exactly one native slang idiom inside brackets: [slang: expression | short meaning]. Do not use raw markdown blocks like "Tip:" or bold text for idioms outside these exact bracket parameters. Everything outside the brackets must be short prose spoken aloud.`;
 
+    const fullMessagesPayload = [
+        { role: "system", content: explicitInstruction },
+        ...conversationHistory
+    ];
+
     try {
-        const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${targetKey}`, {
+        // Query official AGNES API gateway endpoint
+        const response = await fetch("https://apihub.agnes-ai.com/v1/chat/completions", {
             method: "POST",
-            headers: { "Content-Type": "application/json" },
+            headers: { 
+                "Content-Type": "application/json",
+                "Authorization": `Bearer ${targetKey}`
+            },
             body: JSON.stringify({
-                contents: conversationHistory,
-                systemInstruction: { parts: [{ text: explicitInstruction }] }
+                model: "agnes-2.0-flash", 
+                messages: fullMessagesPayload
             })
         });
+        
         const data = await response.json();
-        const rawReply = data.candidates[0].content.parts[0].text;
+        const rawReply = data.choices[0].message.content;
         
         typingBubble.innerHTML = `<strong>Adam:</strong> ${parseAndStoreContent(rawReply)}`;
-        conversationHistory.push({ role: "model", parts: [{ text: rawReply }] });
+        conversationHistory.push({ role: "assistant", content: rawReply });
         
         let voiceCleanText = rawReply.replace(/\[grammar:[^\]]+\]/g, "").replace(/\[slang:\s*([^|]+)\s*\|\s*[^\]]+\]/g, "$1");
         speakText(voiceCleanText.trim());
     } catch (e) {
-        typingBubble.textContent = "Voice synchronization timeout. Please retry.";
+        console.error(e);
+        typingBubble.textContent = "AGNES sync error. Double check your API key layout inside the vault.";
     }
 }
 
@@ -179,7 +190,7 @@ function endPodcast() {
 }
 document.getElementById('end-btn').addEventListener('click', endPodcast);
 
-// CRASH-IMMUNE KEYBOARD VAULT DETECTORS (Ctrl + 0 + P)
+// SYSTEM VAULT DETECTORS (Ctrl + 0 + P)
 let keysPressed = {};
 window.addEventListener('keydown', (e) => {
     if (!e || !e.key) return; 

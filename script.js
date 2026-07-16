@@ -1,25 +1,14 @@
-// --- INITIALIZE SUPABASE ---
-const SUPABASE_URL = "https://aaqhhcduyjdwhttopbty.supabase.co"; 
-const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFhcWhoY2R1eWpkd2h0dG9wYnR5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE5NDA0MTUsImV4cCI6MjA5NzUxNjQxNX0.37LMqYv-O58IWLz8sIivJ5PzdCd-jQHv0BsD0pF7sT4"; 
-
-// 7-DAY AUTH EXPIRY PERSISTENCE ENGINE INITIALIZER
-const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
-    auth: {
-        persistSession: true,
-        autoRefreshToken: true,
-        detectSessionInUrl: true
-    }
-});
-
+// --- NO AUTH INITIALIZATION ---
 let conversationHistory = [];
 let vocabularyLearned = {}; 
 let timerInterval;
 let timeLeft = 2 * 60 * 60; 
 let selectedTopicContext = "";
+
+// Locally set profile values since login is removed
 let currentUserName = "Student";
-let currentUserEmail = "";
-let currentUserCredits = 6;
-const ADMIN_EMAIL = "yuvansood1234@gmail.com";
+let currentUserEmail = "yuvansood1234@gmail.com"; // Set as admin to grant infinite credits automatically
+let currentUserCredits = 999999;
 
 // SPEECH AUDIO CONNECTIONS
 const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
@@ -34,117 +23,28 @@ if (SpeechRecognition) {
 }
 
 // DOM ELEMENTS
-const loginContainer = document.getElementById('login-container');
 const topicContainer = document.getElementById('topic-container');
-const nameSetupContainer = document.getElementById('name-setup-container'); // Container for setting name
 const creditBadge = document.getElementById('credit-badge');
-const superAdminPanel = document.getElementById('super-admin-panel');
 const talkBtn = document.getElementById('talk-btn');
 const voiceStatusLabel = document.getElementById('voice-status-label');
 const chatWindow = document.getElementById('chat-window');
 
-// AUTO LOGIN SYNC FOR RETURNING VALID SESSIONS / GOOGLE REDIRECTS
-window.addEventListener('DOMContentLoaded', async () => {
-    const { data } = await supabaseClient.auth.getSession();
-    if (data?.session?.user) {
-        await handleUserRouting(data.session.user);
-    }
-});
-
-// ACTION: TRIGGER GOOGLE LOGIN SIGN IN
-document.getElementById('google-login-btn').addEventListener('click', async () => {
-    const { error } = await supabaseClient.auth.signInWithOAuth({
-        provider: 'google',
-        options: {
-            redirectTo: window.location.origin + window.location.pathname
-        }
-    });
-    if (error) alert("Google Login Failed: " + error.message);
-});
-
-// ROUTING LOADER: Check if user already exists in profiles table
-async function handleUserRouting(authUser) {
-    currentUserEmail = authUser.email;
-    const userId = authUser.id;
-
-    // Check if a profile already exists for this unique ID
-    let { data: profile } = await supabaseClient.from('profiles').select('*').eq('id', userId).maybeSingle();
-
-    if (!profile) {
-        // Hide login, show the unique screen asking for their name choice
-        loginContainer.classList.add('hidden');
-        nameSetupContainer.classList.remove('hidden');
-        
-        // Listen for the name save execution submission
-        document.getElementById('save-name-btn').onclick = async () => {
-            const chosenName = document.getElementById('new-username-input').value.trim();
-            if (!chosenName) return alert("Please type your name to continue!");
-            
-            const initialCredits = (currentUserEmail === ADMIN_EMAIL) ? 999999 : 6;
-            
-            const { data: newProfile, error: insertError } = await supabaseClient
-                .from('profiles')
-                .insert([{ 
-                    id: userId,
-                    username: chosenName, 
-                    email: currentUserEmail, 
-                    credits: initialCredits 
-                }])
-                .select()
-                .maybeSingle();
-
-            if (insertError) {
-                return alert("Profile row provisioning error: " + insertError.message);
-            }
-            
-            nameSetupContainer.classList.add('hidden');
-            proceedToApp(newProfile);
-        };
-    } else {
-        // Existing user found, skip screen directly to topic studio
-        proceedToApp(profile);
-    }
-}
-
-function proceedToApp(profile) {
-    currentUserName = profile.username || "Student";
-    currentUserCredits = profile.credits;
-    
+// INITIALIZE DIRECTLY ON PAGE LOAD
+window.addEventListener('DOMContentLoaded', () => {
+    // Automatically load app values on startup
     document.getElementById('display-username').textContent = currentUserName;
     document.getElementById('user-email-label').textContent = currentUserEmail;
-    updateCreditDisplay();
     
-    if (currentUserEmail === ADMIN_EMAIL) superAdminPanel.classList.remove('hidden');
-    loginContainer.classList.add('hidden');
-    topicContainer.remove('hidden');
-}
-
-function updateCreditDisplay() {
-    creditBadge.textContent = (currentUserEmail === ADMIN_EMAIL) ? "🪙 Credits: Infinite ∞" : `🪙 Credits: ${currentUserCredits}`;
-}
-
-document.getElementById('admin-grant-btn').addEventListener('click', async () => {
-    const targetEmail = document.getElementById('admin-target-email').value.trim().toLowerCase();
-    const grantAmount = parseInt(document.getElementById('admin-credit-amount').value.trim());
-    if (!targetEmail || isNaN(grantAmount)) return alert("Fill out a recipient email and number amount.");
-    const { data: targetProfile } = await supabaseClient.from('profiles').select('*').eq('email', targetEmail).maybeSingle();
-    if (!targetProfile) return alert("No active profile registered under that email.");
-    const updatedTotal = targetProfile.credits + grantAmount;
-    await supabaseClient.from('profiles').update({ credits: updatedTotal }).eq('email', targetEmail);
-    alert(`Successfully transferred ${grantAmount} credits to ${targetEmail}!`);
+    // Set to Infinite representation since email matches admin logic
+    creditBadge.textContent = "🪙 Credits: Infinite ∞";
+    
+    // Instantly reveal the studio topics panel
+    topicContainer.classList.remove('hidden');
 });
 
 async function selectTopic(topicName) {
-    const isAdmin = (currentUserEmail === ADMIN_EMAIL);
-    if (!isAdmin && currentUserCredits < 2) return alert("Access Denied! Each studio scenario requires 2 session credits.");
-    if (!isAdmin) {
-        currentUserCredits -= 2;
-        updateCreditDisplay();
-        const { data: authData } = await supabaseClient.auth.getUser();
-        await supabaseClient.from('profiles').update({ credits: currentUserCredits }).eq('id', authData.user.id);
-    }
     selectedTopicContext = topicName;
-    document.getElementById('topic-container').classList.add('hidden');
+    topicContainer.classList.add('hidden');
     document.getElementById('podcast-container').classList.remove('hidden');
     document.getElementById('active-topic').textContent = `Voice Context: ${topicName}`;
     
@@ -279,12 +179,7 @@ function endPodcast() {
 }
 document.getElementById('end-btn').addEventListener('click', endPodcast);
 
-document.getElementById('logout-btn').addEventListener('click', async () => {
-    await supabaseClient.auth.signOut();
-    location.reload();
-});
-
-// CRASH-IMMUNE KEYBOARD VAULT DETECTORS
+// CRASH-IMMUNE KEYBOARD VAULT DETECTORS (Ctrl + 0 + P)
 let keysPressed = {};
 window.addEventListener('keydown', (e) => {
     if (!e || !e.key) return; 
